@@ -18,6 +18,10 @@ export function getCarouselPageState(slideCount, pageIndex, itemsPerPage) {
   };
 }
 
+export function getRelativeSlideOffset(slideOffset, firstSlideOffset) {
+  return slideOffset - firstSlideOffset;
+}
+
 export function createCarousel(root) {
   const track = root.querySelector('.carousel-track');
   const slides = [...root.querySelectorAll('.carousel-slide')];
@@ -55,7 +59,11 @@ export function createCarousel(root) {
     activePage = page.activePage;
     activeStartIndex = page.firstSlideIndex;
 
-    track.style.transform = `translateX(-${slides[activeStartIndex].offsetLeft}px)`;
+    const trackOffset = getRelativeSlideOffset(
+      slides[activeStartIndex].offsetLeft,
+      slides[0].offsetLeft
+    );
+    track.style.transform = `translateX(-${trackOffset}px)`;
 
     slides.forEach((slide, slideIndex) => {
       const isVisible = slideIndex >= activeStartIndex && slideIndex < page.finalSlideIndex;
