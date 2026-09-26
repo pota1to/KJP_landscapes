@@ -459,7 +459,7 @@ h2 {
 }
 
 .carousel {
-  width: min(100%, calc(var(--shell) + (var(--gutter) * 2)));
+  width: min(100%, calc(60rem + (var(--gutter) * 2)));
   margin: clamp(3rem, 6vw, 5.5rem) auto 0;
   padding-inline: var(--gutter);
 }
@@ -478,11 +478,13 @@ h2 {
   min-width: 0;
 }
 
-.carousel-slide img {
+.img {
   width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  object-position: center;
   border-radius: 0;
+  background: rgb(5 25 18 / 52%);
 }
 
 .carousel-slide figcaption {
