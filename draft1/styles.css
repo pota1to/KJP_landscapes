@@ -337,6 +337,10 @@ button:focus-visible {
   font-weight: 800;
 }
 
+.hero-spacer {
+  visibility: hidden;
+}
+
 .intro {
   padding-block: clamp(5rem, 10vw, 9rem);
 }
@@ -404,12 +408,6 @@ h2 {
 .service-group:last-child {
   padding-right: 0;
   border-right: 0;
-}
-
-.service-index {
-  color: var(--forest-soft);
-  font-family: var(--display);
-  font-size: 1rem;
 }
 
 .service-group h3 {
