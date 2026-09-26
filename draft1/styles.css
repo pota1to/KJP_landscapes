@@ -459,7 +459,7 @@ h2 {
 }
 
 .carousel {
-  width: min(100%, calc(60rem + (var(--gutter) * 2)));
+  width: min(100%, calc(52rem + (var(--gutter) * 2)));
   margin: clamp(3rem, 6vw, 5.5rem) auto 0;
   padding-inline: var(--gutter);
 }
@@ -474,13 +474,9 @@ h2 {
   gap: 2rem;
 }
 
-.carousel-slide {
-  min-width: 0;
-}
-
-.img {
+.carousel-slide img {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  height: clamp(22rem, 42vw, 28rem);
   object-fit: contain;
   object-position: center;
   border-radius: 0;
@@ -894,12 +890,10 @@ h2 {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .carousel-slide img {
-    aspect-ratio: 4 / 5;
-  }
-
+  .carousel-slide img,
   .carousel.is-enhanced .carousel-slide img {
-    aspect-ratio: 4 / 5;
+    height: clamp(16rem, 72vw, 24rem);
+    aspect-ratio: auto;
   }
 
   .carousel.is-enhanced .carousel-controls {
