@@ -68,9 +68,6 @@ export function createCarousel(root) {
     slides.forEach((slide, slideIndex) => {
       const isVisible = slideIndex >= activeStartIndex && slideIndex < page.finalSlideIndex;
       slide.setAttribute('aria-hidden', String(!isVisible));
-
-      const imageLink = slide.querySelector('.carousel-image-link');
-      if (imageLink) imageLink.tabIndex = isVisible ? 0 : -1;
     });
 
     indicators.forEach((indicator, indicatorIndex) => {

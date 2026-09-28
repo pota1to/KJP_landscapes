@@ -469,12 +469,11 @@ h2 {
   min-width: 0;
 }
 
-.carousel-image-link {
+.carousel-image-frame {
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
-  cursor: zoom-in;
 }
 
 .carousel-track {
