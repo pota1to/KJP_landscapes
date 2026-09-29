@@ -48,6 +48,7 @@ test('service pages contain the approved content and image semantics', async t =
       hasMenu: Boolean(document.querySelector('[data-menu-toggle], [data-site-nav]')),
       callHref: document.querySelector('.call-button')?.getAttribute('href'),
       currentHref: document.querySelector('.site-nav [aria-current="page"]')?.getAttribute('href'),
+      introCallHref: document.querySelector('.page-intro a[href^="tel:"]')?.getAttribute('href'),
       hasClosingCall: Boolean(document.querySelector('.closing-call')),
       hasFooter: Boolean(document.querySelector('.site-footer')),
       details: [...document.querySelectorAll('.service-detail')].map(detail => {
@@ -70,6 +71,7 @@ test('service pages contain the approved content and image semantics', async t =
     assert.equal(state.hasMenu, true);
     assert.equal(state.callHref, 'tel:07745061601');
     assert.equal(state.currentHref, page.current);
+    assert.equal(state.introCallHref, 'tel:07745061601');
     assert.equal(state.hasClosingCall, true);
     assert.equal(state.hasFooter, true);
     assert.equal(state.details.length, page.headings.length);

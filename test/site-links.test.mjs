@@ -92,9 +92,12 @@ test('all pages expose consistent relative navigation and every local resource r
   for (const page of htmlPages) {
     const html = await readFile(new URL(`../${page}`, import.meta.url), 'utf8');
     const references = [...html.matchAll(/(?:href|src)="([^"]+)"/g)].map(match => match[1]);
+    const footer = html.match(/<footer[\s\S]*?<\/footer>/)?.[0] || '';
+    const footerReferences = [...footer.matchAll(/href="([^"]+)"/g)].map(match => match[1]);
     assert.ok(references.includes('index.html'), `${page} needs a home brand link`);
     for (const href of requiredPageLinks) {
       assert.ok(references.includes(href), `${page} is missing ${href}`);
+      assert.ok(footerReferences.includes(href), `${page} footer is missing ${href}`);
     }
     for (const reference of references) {
       if (/^(?:#|tel:|data:|https?:|mailto:)/.test(reference)) continue;

@@ -771,11 +771,15 @@ h2 {
   line-height: 0.92;
 }
 
-.page-intro > p:last-child {
+.page-intro > p:not(.section-number) {
   max-width: 48rem;
   color: var(--muted);
   font-size: clamp(1rem, 1.5vw, 1.18rem);
   line-height: 1.8;
+}
+
+.page-intro .primary-action {
+  margin-top: 2rem;
 }
 
 .service-details {
