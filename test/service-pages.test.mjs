@@ -100,13 +100,22 @@ test('service sections alternate on desktop and images stay within one third', a
       const section = detail.getBoundingClientRect();
       const copy = detail.querySelector('.service-detail__copy').getBoundingClientRect();
       const media = detail.querySelector('.service-detail__media').getBoundingClientRect();
-      return { sectionWidth: section.width, copyLeft: copy.left, mediaLeft: media.left, mediaWidth: media.width };
+      const image = detail.querySelector('img').getBoundingClientRect();
+      return {
+        sectionWidth: section.width,
+        copyLeft: copy.left,
+        mediaLeft: media.left,
+        mediaWidth: media.width,
+        imageWidth: image.width,
+        imageHeight: image.height,
+      };
     }))()`);
     assert.equal(layouts.length, page.headings.length);
     layouts.forEach((layout, index) => {
       if (index % 2 === 0) assert.ok(layout.copyLeft < layout.mediaLeft);
       else assert.ok(layout.mediaLeft < layout.copyLeft);
       assert.ok(layout.mediaWidth <= layout.sectionWidth / 3 + 1);
+      assert.ok(Math.abs((layout.imageWidth / layout.imageHeight) - (4 / 3)) < 0.01);
     });
   }
 });
