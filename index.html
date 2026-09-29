@@ -16,16 +16,24 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="#top" aria-label="KJP Landscapes and Groundworks home">
+      <a class="brand" href="index.html" aria-label="KJP Landscapes and Groundworks home">
         <span class="brand-mark" aria-hidden="true">KJP</span>
         <span class="brand-name">Landscapes <span>&amp; Groundworks</span></span>
       </a>
 
-      <nav class="site-nav" aria-label="Main navigation">
-        <a href="#services">Services</a>
-        <a href="#gallery">Our work</a>
-        <a href="#about">About</a>
+      <nav class="site-nav" id="site-navigation" data-site-nav aria-label="Main navigation">
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="groundworks-structural.html">Groundworks &amp; Structural</a>
+        <a href="hardscaping-features.html">Hardscaping &amp; Features</a>
+        <a href="lawns-decking.html">Lawns &amp; Decking</a>
+        <a href="about.html">About</a>
       </nav>
+
+      <button class="menu-toggle" type="button" data-menu-toggle aria-controls="site-navigation" aria-expanded="false" aria-label="Open menu" hidden>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
 
       <a class="call-button" href="tel:07745061601" aria-label="Call KJP Landscapes and Groundworks on 07745 061601">
         <span class="call-label">Call</span>
