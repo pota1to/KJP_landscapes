@@ -60,9 +60,15 @@ class CdpClient {
     this.socket = socket;
     this.nextId = 1;
     this.pending = new Map();
+    this.eventHandlers = new Map();
     socket.addEventListener('message', event => {
       const message = JSON.parse(event.data);
-      if (!message.id) return;
+      if (!message.id) {
+        for (const handler of this.eventHandlers.get(message.method) || []) {
+          handler(message.params);
+        }
+        return;
+      }
       const request = this.pending.get(message.id);
       if (!request) return;
       this.pending.delete(message.id);
@@ -87,6 +93,12 @@ class CdpClient {
     });
     this.socket.send(JSON.stringify({ id, method, params }));
     return await response;
+  }
+
+  on(method, handler) {
+    const handlers = this.eventHandlers.get(method) || [];
+    handlers.push(handler);
+    this.eventHandlers.set(method, handlers);
   }
 
   close() {
@@ -118,6 +130,14 @@ export async function launchBrowser({ javascriptEnabled = true } = {}) {
   await client.send('Page.enable');
   await client.send('Runtime.enable');
   await client.send('Emulation.setScriptExecutionDisabled', { value: !javascriptEnabled });
+  const browserErrors = [];
+  client.on('Runtime.exceptionThrown', ({ exceptionDetails }) => {
+    browserErrors.push(exceptionDetails.exception?.description || exceptionDetails.text);
+  });
+  client.on('Runtime.consoleAPICalled', ({ type, args }) => {
+    if (type !== 'error') return;
+    browserErrors.push(args.map(argument => argument.value || argument.description || '').join(' '));
+  });
 
   const evaluate = async expression => {
     const response = await client.send('Runtime.evaluate', {
@@ -170,6 +190,12 @@ export async function launchBrowser({ javascriptEnabled = true } = {}) {
       await delay(50);
     },
     setViewport,
+    getErrors() {
+      return [...browserErrors];
+    },
+    clearErrors() {
+      browserErrors.length = 0;
+    },
     async close() {
       client.close();
       await stopProcess(child);
