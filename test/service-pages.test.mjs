@@ -10,6 +10,7 @@ const pages = [
     title: 'Groundworks & Structural | KJP Landscapes & Groundworks',
     h1: 'Groundworks & Structural',
     current: 'groundworks-structural.html',
+    heroAsset: 'hero-groundworks.webp',
     headings: ['Concrete Work', 'Drainage Solutions'],
   },
   {
@@ -17,6 +18,7 @@ const pages = [
     title: 'Hardscaping & Features | KJP Landscapes & Groundworks',
     h1: 'Hardscaping & Features',
     current: 'hardscaping-features.html',
+    heroAsset: 'hero-hardscaping.webp',
     headings: ['Paving & Patios', 'Fencing & Privacy', 'Raised Beds'],
   },
   {
@@ -24,7 +26,16 @@ const pages = [
     title: 'Lawns & Decking | KJP Landscapes & Groundworks',
     h1: 'Lawns & Decking',
     current: 'lawns-decking.html',
+    heroAsset: 'hero-lawns.webp',
     headings: ['Premium Decking', 'Turfing & Lawns', 'Artificial Grass'],
+  },
+];
+
+const heroPages = [
+  ...pages,
+  {
+    path: '/about.html',
+    heroAsset: 'hero-about.webp',
   },
 ];
 
@@ -84,6 +95,63 @@ test('service pages contain the approved content and image semantics', async t =
       assert.match(detail.stockNote, /Illustrative stock photograph/i);
     }
     assert.deepEqual(browser.getErrors(), [], `${page.path} logged a JavaScript error`);
+  }
+});
+
+
+test('internal pages use compact responsive image-backed heroes', async t => {
+  const site = await startTestSite(process.cwd());
+  const browser = await launchBrowser();
+  t.after(async () => {
+    await browser.close();
+    await site.close();
+  });
+
+  for (const page of heroPages) {
+    await browser.goto(`${site.origin}${page.path}`, { width: 1200, height: 900 });
+    const desktop = await browser.evaluate(`(() => {
+      const hero = document.querySelector('.page-intro');
+      const inner = hero?.querySelector('.page-intro__inner');
+      const heading = hero?.querySelector('h1');
+      const label = hero?.querySelector('.section-number');
+      const paragraph = hero?.querySelector('p:not(.section-number)');
+      const action = hero?.querySelector('.primary-action');
+      const style = hero ? getComputedStyle(hero) : null;
+      return {
+        hasInner: Boolean(inner),
+        backgroundImage: style?.backgroundImage || '',
+        backgroundSize: style?.backgroundSize || '',
+        height: hero?.getBoundingClientRect().height || 0,
+        headingColor: heading ? getComputedStyle(heading).color : '',
+        labelColor: label ? getComputedStyle(label).color : '',
+        paragraphColor: paragraph ? getComputedStyle(paragraph).color : '',
+        innerWidth: inner?.getBoundingClientRect().width || 0,
+        actionWidth: action?.getBoundingClientRect().width || 0,
+      };
+    })()`);
+
+    assert.equal(desktop.hasInner, true, page.path);
+    assert.match(desktop.backgroundImage, /linear-gradient/, page.path);
+    assert.match(desktop.backgroundImage, new RegExp(page.heroAsset), page.path);
+    assert.match(desktop.backgroundSize, /^cover(?:, cover)*$/);
+    assert.ok(desktop.height >= 400 && desktop.height <= 560, `${page.path} hero is not compact`);
+    assert.equal(desktop.headingColor, 'rgb(255, 255, 255)');
+    assert.equal(desktop.labelColor, 'rgb(185, 239, 88)');
+    assert.match(desktop.paragraphColor, /^rgba?\(255, 255, 255/);
+    if (desktop.actionWidth) {
+      assert.ok(desktop.actionWidth < desktop.innerWidth * 0.6, `${page.path} action should not stretch`);
+    }
+
+    await browser.setViewport({ width: 390, height: 844 });
+    const mobile = await browser.evaluate(`(() => {
+      const hero = document.querySelector('.page-intro');
+      return {
+        noOverflow: document.documentElement.scrollWidth <= window.innerWidth,
+        height: hero?.getBoundingClientRect().height || 0,
+      };
+    })()`);
+    assert.equal(mobile.noOverflow, true, page.path);
+    assert.ok(mobile.height >= 400 && mobile.height <= 520, `${page.path} mobile hero is not compact`);
   }
 });
 

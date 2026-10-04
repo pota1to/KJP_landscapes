@@ -757,29 +757,69 @@ h2 {
 }
 
 .page-intro {
-  padding-block: clamp(5rem, 10vw, 8.5rem) clamp(3.5rem, 7vw, 6rem);
-  border-bottom: 1px solid var(--line);
+  --page-intro-position: center;
+  overflow: hidden;
+  background-color: var(--forest-dark);
+  background-image:
+    linear-gradient(90deg, rgb(5 33 23 / 92%) 0%, rgb(9 45 31 / 76%) 48%, rgb(7 30 22 / 34%) 100%),
+    linear-gradient(0deg, rgb(7 29 21 / 58%) 0%, transparent 56%),
+    var(--page-intro-image);
+  background-position: center, center, var(--page-intro-position);
+  background-size: cover;
+  color: var(--white);
+}
+
+.page-intro--groundworks {
+  --page-intro-image: url("assets/hero-groundworks.webp");
+  --page-intro-position: center 58%;
+}
+
+.page-intro--hardscaping {
+  --page-intro-image: url("assets/hero-hardscaping.webp");
+  --page-intro-position: center 56%;
+}
+
+.page-intro--lawns {
+  --page-intro-image: url("assets/hero-lawns.webp");
+  --page-intro-position: center 56%;
+}
+
+.page-intro--about {
+  --page-intro-image: url("assets/hero-about.webp");
+  --page-intro-position: center 62%;
+}
+
+.page-intro__inner {
+  display: grid;
+  align-content: center;
+  min-height: clamp(26rem, 42vw, 34rem);
+  padding-block: clamp(4rem, 8vw, 6.5rem);
+}
+
+.page-intro .section-number {
+  color: var(--lime);
 }
 
 .page-intro h1 {
   max-width: 12ch;
   margin: 1.1rem 0 2rem;
-  color: var(--forest-dark);
+  color: var(--white);
   font-family: var(--display);
-  font-size: clamp(3.6rem, 8vw, 7.5rem);
+  font-size: clamp(3.5rem, 6.5vw, 6.2rem);
   font-weight: 400;
   letter-spacing: -0.055em;
   line-height: 0.92;
 }
 
-.page-intro > p:not(.section-number) {
+.page-intro__inner > p:not(.section-number) {
   max-width: 48rem;
-  color: var(--muted);
+  color: rgb(255 255 255 / 86%);
   font-size: clamp(1rem, 1.5vw, 1.18rem);
   line-height: 1.8;
 }
 
 .page-intro .primary-action {
+  justify-self: start;
   margin-top: 2rem;
 }
 
@@ -1108,12 +1148,18 @@ h2 {
     clip: rect(0, 0, 0, 0);
   }
 
-  .page-intro {
-    padding-block: 4rem 3rem;
+  .page-intro__inner {
+    min-height: 26rem;
+    padding-block: 3rem;
   }
 
   .page-intro h1 {
-    font-size: clamp(3.2rem, 15vw, 5.2rem);
+    margin-bottom: 1.5rem;
+    font-size: clamp(2.8rem, 12vw, 4.5rem);
+  }
+
+  .page-intro__inner > p:not(.section-number) {
+    line-height: 1.65;
   }
 
   .service-details {

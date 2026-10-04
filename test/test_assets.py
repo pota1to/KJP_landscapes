@@ -18,6 +18,13 @@ ASSETS = {
     "service-artificial-grass.webp": "Engin Akyurt",
 }
 
+HERO_ASSETS = {
+    "hero-groundworks.webp": (960, 720),
+    "hero-hardscaping.webp": (1600, 1200),
+    "hero-lawns.webp": (960, 720),
+    "hero-about.webp": (960, 540),
+}
+
 
 class CreditParser(HTMLParser):
     def __init__(self):
@@ -42,6 +49,16 @@ class ServiceAssetTests(unittest.TestCase):
                 with Image.open(path) as image:
                     self.assertEqual(image.format, "WEBP")
                     self.assertEqual(image.size, (1200, 900))
+                self.assertLessEqual(path.stat().st_size, 350 * 1024)
+
+    def test_internal_hero_images_are_optimised_webp_files(self):
+        for filename, expected_size in HERO_ASSETS.items():
+            path = ROOT / "assets" / filename
+            with self.subTest(filename=filename):
+                self.assertTrue(path.exists(), f"Missing {filename}")
+                with Image.open(path) as image:
+                    self.assertEqual(image.format, "WEBP")
+                    self.assertEqual(image.size, expected_size)
                 self.assertLessEqual(path.stat().st_size, 350 * 1024)
 
     def test_credits_page_lists_sources_and_site_navigation(self):
