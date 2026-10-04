@@ -792,7 +792,7 @@ h2 {
 .page-intro__inner {
   display: grid;
   align-content: center;
-  min-height: clamp(30.25rem, calc(11.1rem + 31.25vw), 34.5rem);
+  min-height: clamp(30.25rem, calc(11.1rem + 31.25vw), 41rem);
   padding-block: clamp(4rem, 8vw, 6.5rem);
 }
 

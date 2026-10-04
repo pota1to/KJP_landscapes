@@ -103,6 +103,7 @@ test('internal pages use compact responsive image-backed heroes', async t => {
   const site = await startTestSite(process.cwd());
   const browser = await launchBrowser();
   const desktopHeights = [];
+  const wideDesktopHeights = [];
   const tabletHeights = [];
   const mobileHeights = [];
   t.after(async () => {
@@ -146,6 +147,12 @@ test('internal pages use compact responsive image-backed heroes', async t => {
     }
     desktopHeights.push(desktop.height);
 
+    await browser.setViewport({ width: 1863, height: 927 });
+    const wideDesktopHeight = await browser.evaluate(
+      `document.querySelector('.page-intro')?.getBoundingClientRect().height || 0`,
+    );
+    wideDesktopHeights.push(wideDesktopHeight);
+
     await browser.setViewport({ width: 980, height: 900 });
     const tabletHeight = await browser.evaluate(
       `document.querySelector('.page-intro')?.getBoundingClientRect().height || 0`,
@@ -167,6 +174,7 @@ test('internal pages use compact responsive image-backed heroes', async t => {
 
   for (const [label, heights] of [
     ['desktop', desktopHeights],
+    ['wide desktop', wideDesktopHeights],
     ['tablet', tabletHeights],
     ['mobile', mobileHeights],
   ]) {
