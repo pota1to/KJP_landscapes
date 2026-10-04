@@ -102,6 +102,9 @@ test('service pages contain the approved content and image semantics', async t =
 test('internal pages use compact responsive image-backed heroes', async t => {
   const site = await startTestSite(process.cwd());
   const browser = await launchBrowser();
+  const desktopHeights = [];
+  const tabletHeights = [];
+  const mobileHeights = [];
   t.after(async () => {
     await browser.close();
     await site.close();
@@ -141,6 +144,13 @@ test('internal pages use compact responsive image-backed heroes', async t => {
     if (desktop.actionWidth) {
       assert.ok(desktop.actionWidth < desktop.innerWidth * 0.6, `${page.path} action should not stretch`);
     }
+    desktopHeights.push(desktop.height);
+
+    await browser.setViewport({ width: 980, height: 900 });
+    const tabletHeight = await browser.evaluate(
+      `document.querySelector('.page-intro')?.getBoundingClientRect().height || 0`,
+    );
+    tabletHeights.push(tabletHeight);
 
     await browser.setViewport({ width: 390, height: 844 });
     const mobile = await browser.evaluate(`(() => {
@@ -152,6 +162,16 @@ test('internal pages use compact responsive image-backed heroes', async t => {
     })()`);
     assert.equal(mobile.noOverflow, true, page.path);
     assert.ok(mobile.height >= 400 && mobile.height <= 520, `${page.path} mobile hero is not compact`);
+    mobileHeights.push(mobile.height);
+  }
+
+  for (const [label, heights] of [
+    ['desktop', desktopHeights],
+    ['tablet', tabletHeights],
+    ['mobile', mobileHeights],
+  ]) {
+    const heightDifference = Math.max(...heights) - Math.min(...heights);
+    assert.ok(heightDifference <= 1, `internal ${label} hero heights differ by ${heightDifference}px`);
   }
 });
 
