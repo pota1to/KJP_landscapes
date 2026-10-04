@@ -18,7 +18,7 @@
 - Use relative page and asset paths that work beneath a GitHub Pages repository subpath.
 - Keep all photography rectangular with no rounded corners.
 - Store service imagery locally as centred 1200×900 WebP files and lazy-load it below the page introduction.
-- Use a desktop `2fr 1fr` service-detail grid so photography occupies no more than one-third of each subsection.
+- Use a desktop `1fr 1fr` service-detail grid so photography and copy occupy equal-width columns.
 - Stack mobile service content in text-then-image reading order.
 - Mark service-page stock photography as illustrative and credit every source in `credits.html`.
 - Preserve the homepage carousel's three desktop states, six mobile states, square crops, and non-clickable images.
@@ -197,7 +197,7 @@ In `test/service-pages.test.mjs`, use the browser harness to assert:
 - Hardscaping contains exactly Paving & Patios, Fencing & Privacy, and Raised Beds.
 - Lawns contains exactly Premium Decking, Turfing & Lawns, and Artificial Grass.
 - Each detail has one local service image with non-empty alt text, explicit `1200`×`900`, `loading="lazy"`, and a nearby illustrative-stock notice.
-- At 1200px, odd sections place text left/image right; even sections place image left/text right; each image width is no more than one-third of its section width.
+- At 1200px, odd sections place text left/image right; even sections place image left/text right; image and text columns have equal widths.
 - At 390px, every detail uses one column and the text begins above the image.
 - Loading each service page produces no JavaScript console errors despite having no carousel.
 
@@ -209,7 +209,7 @@ Expected: FAIL because the three pages and reusable service-detail styles do not
 
 - [ ] **Step 3: Add reusable page and service-detail styles**
 
-Add compact `.page-intro` styling that follows the current green editorial system. Add a bordered `.service-details` sequence and a `2fr 1fr` `.service-detail` grid. Use CSS placement on even sections while retaining text-before-image DOM order. Style every media frame at `aspect-ratio: 4 / 3`, `overflow: hidden`, `border-radius: 0`, with centred cover cropping. At `760px` and below, use one column and restore copy then image placement.
+Add compact `.page-intro` styling that follows the current green editorial system. Add a bordered `.service-details` sequence and a `1fr 1fr` `.service-detail` grid. Use CSS placement on even sections while retaining text-before-image DOM order. Style every media frame at `aspect-ratio: 4 / 3`, `overflow: hidden`, `border-radius: 0`, with centred cover cropping. At `760px` and below, use one column and restore copy then image placement.
 
 - [ ] **Step 4: Create `groundworks-structural.html`**
 
@@ -333,7 +333,7 @@ Expected: exit 0 with no output.
 
 - [ ] **Step 5: Capture desktop screenshots for every primary page**
 
-At 1440×1000, capture the homepage, three service pages, and About page. Verify the editorial hierarchy, sticky header, full navigation, call button, image one-third limit, alternating placement, no rounded photography, and no horizontal overflow.
+At 1440×1000, capture the homepage, three service pages, and About page. Verify the editorial hierarchy, sticky header, full navigation, call button, equal text/image columns, alternating placement, no rounded photography, and no horizontal overflow.
 
 - [ ] **Step 6: Capture mobile screenshots for every primary page**
 

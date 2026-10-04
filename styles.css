@@ -788,7 +788,7 @@ h2 {
 
 .service-detail {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(2.5rem, 7vw, 7rem);
   align-items: center;
   padding-block: clamp(3.5rem, 7vw, 6.5rem);
@@ -840,7 +840,7 @@ h2 {
 }
 
 .service-detail:nth-child(even) {
-  grid-template-columns: minmax(16rem, 1fr) minmax(0, 2fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .service-detail:nth-child(even) .service-detail__media {

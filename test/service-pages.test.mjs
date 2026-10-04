@@ -88,7 +88,7 @@ test('service pages contain the approved content and image semantics', async t =
 });
 
 
-test('service sections alternate on desktop and images stay within one third', async t => {
+test('service sections alternate on desktop with equal text and image columns', async t => {
   const site = await startTestSite(process.cwd());
   const browser = await launchBrowser();
   t.after(async () => {
@@ -106,6 +106,7 @@ test('service sections alternate on desktop and images stay within one third', a
       return {
         sectionWidth: section.width,
         copyLeft: copy.left,
+        copyWidth: copy.width,
         mediaLeft: media.left,
         mediaWidth: media.width,
         imageWidth: image.width,
@@ -116,7 +117,7 @@ test('service sections alternate on desktop and images stay within one third', a
     layouts.forEach((layout, index) => {
       if (index % 2 === 0) assert.ok(layout.copyLeft < layout.mediaLeft);
       else assert.ok(layout.mediaLeft < layout.copyLeft);
-      assert.ok(layout.mediaWidth <= layout.sectionWidth / 3 + 1);
+      assert.ok(Math.abs(layout.mediaWidth - layout.copyWidth) <= 1);
       assert.ok(Math.abs((layout.imageWidth / layout.imageHeight) - (4 / 3)) < 0.01);
     });
   }
