@@ -75,6 +75,33 @@ test('mobile menu opens and closes accessibly', async () => {
   }
 });
 
+test('mobile menu highlights the current page without an underline or side border', async () => {
+  const browser = await launchBrowser();
+  try {
+    await browser.goto(`${site.origin}/hardscaping-features.html`, { width: 760, height: 900 });
+    await browser.click('[data-menu-toggle]');
+
+    assert.deepEqual(await browser.evaluate(`(() => {
+      const activeLink = document.querySelector('[data-site-nav] a[aria-current="page"]');
+      const style = getComputedStyle(activeLink);
+      const underline = getComputedStyle(activeLink, '::after');
+      return {
+        backgroundColor: style.backgroundColor,
+        color: style.color,
+        borderLeftWidth: style.borderLeftWidth,
+        underlineDisplay: underline.display,
+      };
+    })()`), {
+      backgroundColor: 'rgb(230, 244, 200)',
+      color: 'rgb(11, 47, 34)',
+      borderLeftWidth: '0px',
+      underlineDisplay: 'none',
+    });
+  } finally {
+    await browser.close();
+  }
+});
+
 test('navigation resets at desktop width and degrades without JavaScript', async () => {
   const browser = await launchBrowser();
   try {

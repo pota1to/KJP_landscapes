@@ -5,6 +5,7 @@
   --forest-dark: #0b2f22;
   --forest-soft: #2b6950;
   --lime: #b9ef58;
+  --lime-soft: #e6f4c8;
   --paper: #f5f5ed;
   --paper-deep: #e9ebdd;
   --white: #ffffff;
@@ -996,6 +997,15 @@ h2 {
     min-height: 44px;
     padding-block: 0.7rem;
     border-bottom: 1px solid var(--line);
+  }
+
+  .site-header.menu-ready .site-nav a[aria-current="page"] {
+    background: var(--lime-soft);
+    color: var(--forest-dark);
+  }
+
+  .site-header.menu-ready .site-nav a[aria-current="page"]::after {
+    display: none;
   }
 
   .site-header.menu-ready .site-nav a:last-child {
