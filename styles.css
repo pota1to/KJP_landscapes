@@ -1120,11 +1120,11 @@ h2 {
   }
 
   .service-detail__copy {
-    order: 1;
+    order: 2;
   }
 
   .service-detail__media {
-    order: 2;
+    order: 1;
   }
 
   .about-section {

@@ -124,7 +124,7 @@ test('service sections alternate on desktop with equal text and image columns', 
 });
 
 
-test('service sections stack copy before photography on mobile', async t => {
+test('service sections stack photography before copy on mobile', async t => {
   const site = await startTestSite(process.cwd());
   const browser = await launchBrowser();
   t.after(async () => {
@@ -150,7 +150,7 @@ test('service sections stack copy before photography on mobile', async t => {
     assert.equal(state.layouts.length, page.headings.length);
     state.layouts.forEach(layout => {
       assert.equal(layout.columns, 1);
-      assert.ok(layout.copyTop < layout.mediaTop);
+      assert.ok(layout.mediaTop < layout.copyTop);
     });
   }
 });
