@@ -124,7 +124,7 @@ test('service sections alternate on desktop with equal text and image columns', 
 });
 
 
-test('service sections stack photography before copy on mobile', async t => {
+test('service sections place photography between headings and paragraphs on mobile', async t => {
   const site = await startTestSite(process.cwd());
   const browser = await launchBrowser();
   t.after(async () => {
@@ -137,12 +137,15 @@ test('service sections stack photography before copy on mobile', async t => {
     const state = await browser.evaluate(`(() => ({
       noOverflow: document.documentElement.scrollWidth <= window.innerWidth,
       layouts: [...document.querySelectorAll('.service-detail')].map(detail => {
-        const copy = detail.querySelector('.service-detail__copy').getBoundingClientRect();
+        const heading = detail.querySelector('h2').getBoundingClientRect();
         const media = detail.querySelector('.service-detail__media').getBoundingClientRect();
+        const paragraph = detail.querySelector('p:not(.section-number)').getBoundingClientRect();
         return {
           columns: getComputedStyle(detail).gridTemplateColumns.split(' ').length,
-          copyTop: copy.top,
+          headingBottom: heading.bottom,
           mediaTop: media.top,
+          mediaBottom: media.bottom,
+          paragraphTop: paragraph.top,
         };
       }),
     }))()`);
@@ -150,7 +153,8 @@ test('service sections stack photography before copy on mobile', async t => {
     assert.equal(state.layouts.length, page.headings.length);
     state.layouts.forEach(layout => {
       assert.equal(layout.columns, 1);
-      assert.ok(layout.mediaTop < layout.copyTop);
+      assert.ok(layout.headingBottom <= layout.mediaTop);
+      assert.ok(layout.mediaBottom <= layout.paragraphTop);
     });
   }
 });

@@ -789,13 +789,19 @@ h2 {
 .service-detail {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(2.5rem, 7vw, 7rem);
+  grid-template-areas:
+    "copy media"
+    "body media";
+  column-gap: clamp(2.5rem, 7vw, 7rem);
+  row-gap: 0;
   align-items: center;
   padding-block: clamp(3.5rem, 7vw, 6.5rem);
   border-bottom: 1px solid var(--line);
 }
 
 .service-detail__copy {
+  grid-area: copy;
+  align-self: end;
   max-width: 43rem;
 }
 
@@ -803,17 +809,25 @@ h2 {
   margin: 1rem 0 1.75rem;
 }
 
-.service-detail__copy p:not(.section-number) {
+.service-detail__body {
+  grid-area: body;
+  align-self: start;
+  max-width: 43rem;
+}
+
+.service-detail__body p {
   max-width: 39rem;
   color: var(--muted);
   line-height: 1.85;
 }
 
-.service-detail__copy p + p {
+.service-detail__body p + p {
   margin-top: 1.2rem;
 }
 
 .service-detail__media {
+  grid-area: media;
+  align-self: center;
   margin: 0;
   min-width: 0;
 }
@@ -834,18 +848,11 @@ h2 {
   line-height: 1.45;
 }
 
-.service-detail:nth-child(even) .service-detail__copy {
-  grid-column: 2;
-  grid-row: 1;
-}
-
 .service-detail:nth-child(even) {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.service-detail:nth-child(even) .service-detail__media {
-  grid-column: 1;
-  grid-row: 1;
+  grid-template-areas:
+    "media copy"
+    "media body";
 }
 
 .credits {
@@ -1105,26 +1112,32 @@ h2 {
 
   .service-detail {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "copy"
+      "media"
+      "body";
     gap: 2rem;
     padding-block: 3rem;
   }
 
   .service-detail:nth-child(even) {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .service-detail:nth-child(even) .service-detail__copy,
-  .service-detail:nth-child(even) .service-detail__media {
-    grid-column: auto;
-    grid-row: auto;
+    grid-template-areas:
+      "copy"
+      "media"
+      "body";
   }
 
   .service-detail__copy {
-    order: 2;
+    align-self: auto;
   }
 
-  .service-detail__media {
-    order: 1;
+  .service-detail__copy h2 {
+    margin-bottom: 0;
+  }
+
+  .service-detail__body {
+    align-self: auto;
   }
 
   .about-section {
