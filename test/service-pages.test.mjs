@@ -65,6 +65,7 @@ test('service pages contain the approved content and image semantics', async t =
       details: [...document.querySelectorAll('.service-detail')].map(detail => {
         const image = detail.querySelector('img');
         return {
+          heading: detail.querySelector('h2')?.textContent.trim(),
           image: image?.getAttribute('src'),
           alt: image?.getAttribute('alt'),
           width: image?.getAttribute('width'),
@@ -92,7 +93,18 @@ test('service pages contain the approved content and image semantics', async t =
       assert.equal(detail.width, '1200');
       assert.equal(detail.height, '900');
       assert.equal(detail.loading, 'lazy');
-      assert.match(detail.stockNote, /Illustrative stock photograph/i);
+      if ([
+        'Concrete Work',
+        'Drainage Solutions',
+        'Paving & Patios',
+        'Fencing & Privacy',
+        'Raised Beds',
+        'Premium Decking',
+        'Turfing & Lawns',
+        'Artificial Grass',
+      ].includes(detail.heading)) {
+        assert.match(detail.stockNote, /KJP project photograph/i);
+      }
     }
     assert.deepEqual(browser.getErrors(), [], `${page.path} logged a JavaScript error`);
   }

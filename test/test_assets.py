@@ -8,14 +8,14 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = {
-    "service-concrete.webp": "Life Of Pix",
-    "service-drainage.webp": "Sergei Starostin",
-    "service-paving.webp": "Jonathan Borba",
-    "service-fencing.webp": "Ksu&Eli Studio",
-    "service-raised-beds.webp": "Alfo Medeiros",
-    "service-decking.webp": "Vishv Shah",
-    "service-turfing.webp": "Anna Shvets",
-    "service-artificial-grass.webp": "Engin Akyurt",
+    "service-concrete.webp": None,
+    "service-drainage.webp": None,
+    "service-paving.webp": None,
+    "service-fencing.webp": None,
+    "service-raised-beds.webp": None,
+    "service-decking.webp": None,
+    "service-turfing.webp": None,
+    "service-artificial-grass.webp": None,
 }
 
 HERO_ASSETS = {
@@ -72,12 +72,21 @@ class ServiceAssetTests(unittest.TestCase):
             href for href in parser.links
             if href.startswith("https://www.pexels.com/photo/")
         ]
-        self.assertEqual(len(pexels_links), 8)
-        self.assertIn("Illustrative stock photography", html)
+        self.assertEqual(len(pexels_links), 0)
+        self.assertIn("KJP project photography", html)
+        self.assertNotIn("Illustrative stock photography", html)
         self.assertIn("styles.css", parser.stylesheets)
         decoded_html = unescape(html)
-        for photographer in ASSETS.values():
+        for photographer in filter(None, ASSETS.values()):
             self.assertIn(photographer, decoded_html)
+        self.assertNotIn("Life Of Pix", decoded_html)
+        self.assertNotIn("Sergei Starostin", decoded_html)
+        self.assertNotIn("Jonathan Borba", decoded_html)
+        self.assertNotIn("Ksu&Eli Studio", decoded_html)
+        self.assertNotIn("Alfo Medeiros", decoded_html)
+        self.assertNotIn("Vishv Shah", decoded_html)
+        self.assertNotIn("Anna Shvets", decoded_html)
+        self.assertNotIn("Engin Akyurt", decoded_html)
         for page in (
             "index.html",
             "groundworks-structural.html",
