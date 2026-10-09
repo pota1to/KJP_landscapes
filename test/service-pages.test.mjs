@@ -71,7 +71,7 @@ test('service pages contain the approved content and image semantics', async t =
           width: image?.getAttribute('width'),
           height: image?.getAttribute('height'),
           loading: image?.getAttribute('loading'),
-          stockNote: detail.querySelector('.stock-note')?.textContent.trim(),
+          hasCaption: Boolean(detail.querySelector('figcaption')),
         };
       }),
     }))()`);
@@ -93,18 +93,7 @@ test('service pages contain the approved content and image semantics', async t =
       assert.equal(detail.width, '1200');
       assert.equal(detail.height, '900');
       assert.equal(detail.loading, 'lazy');
-      if ([
-        'Concrete Work',
-        'Drainage Solutions',
-        'Paving & Patios',
-        'Fencing & Privacy',
-        'Raised Beds',
-        'Premium Decking',
-        'Turfing & Lawns',
-        'Artificial Grass',
-      ].includes(detail.heading)) {
-        assert.match(detail.stockNote, /KJP project photograph/i);
-      }
+      assert.equal(detail.hasCaption, false);
     }
     assert.deepEqual(browser.getErrors(), [], `${page.path} logged a JavaScript error`);
   }

@@ -11,7 +11,6 @@ const htmlPages = [
   'hardscaping-features.html',
   'lawns-decking.html',
   'about.html',
-  'credits.html',
 ];
 
 const requiredPageLinks = [
@@ -20,7 +19,6 @@ const requiredPageLinks = [
   'hardscaping-features.html',
   'lawns-decking.html',
   'about.html',
-  'credits.html',
 ];
 
 
@@ -95,6 +93,7 @@ test('all pages expose consistent relative navigation and every local resource r
     const footer = html.match(/<footer[\s\S]*?<\/footer>/)?.[0] || '';
     const footerReferences = [...footer.matchAll(/href="([^"]+)"/g)].map(match => match[1]);
     assert.ok(references.includes('index.html'), `${page} needs a home brand link`);
+    assert.ok(!references.includes('credits.html'), `${page} still links to credits.html`);
     for (const href of requiredPageLinks) {
       assert.ok(references.includes(href), `${page} is missing ${href}`);
       assert.ok(footerReferences.includes(href), `${page} footer is missing ${href}`);
