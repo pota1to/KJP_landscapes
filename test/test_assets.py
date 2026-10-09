@@ -25,6 +25,29 @@ HERO_ASSETS = {
 
 
 class ServiceAssetTests(unittest.TestCase):
+    def test_all_pages_use_the_crawlable_kjp_png_favicon(self):
+        favicon = ROOT / "kjp-logo96x96.png"
+        self.assertTrue(favicon.exists(), "Missing kjp-logo96x96.png")
+        with Image.open(favicon) as image:
+            self.assertEqual(image.format, "PNG")
+            self.assertEqual(image.size, (96, 96))
+
+        expected_link = (
+            '<link rel="icon" type="image/png" sizes="96x96" '
+            'href="/kjp-logo96x96.png">'
+        )
+        for page in (
+            "index.html",
+            "groundworks-structural.html",
+            "hardscaping-features.html",
+            "lawns-decking.html",
+            "about.html",
+        ):
+            html = (ROOT / page).read_text(encoding="utf-8")
+            with self.subTest(page=page):
+                self.assertIn(expected_link, html)
+                self.assertNotIn("data:image/svg+xml", html)
+
     def test_service_images_are_optimised_webp_files(self):
         for filename in SERVICE_ASSETS:
             path = ROOT / "assets" / filename

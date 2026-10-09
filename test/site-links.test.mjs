@@ -112,6 +112,17 @@ test('all pages expose consistent relative navigation and every local resource r
 });
 
 
+test('all pages use the crawlable KJP PNG favicon', async () => {
+  const faviconLink = '<link rel="icon" type="image/png" sizes="96x96" href="/kjp-logo96x96.png">';
+
+  for (const page of htmlPages) {
+    const html = await readFile(new URL(`../${page}`, import.meta.url), 'utf8');
+    assert.ok(html.includes(faviconLink), `${page} is missing the KJP PNG favicon`);
+    assert.doesNotMatch(html, /data:image\/svg\+xml/, `${page} still embeds the old SVG favicon`);
+  }
+});
+
+
 test('320px header keeps the full brand, menu and call action usable', async t => {
   const site = await startTestSite(process.cwd());
   const browser = await launchBrowser();
