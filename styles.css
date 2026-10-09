@@ -804,9 +804,9 @@ h2 {
   max-width: 12ch;
   margin: 1.1rem 0 2rem;
   color: var(--white);
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(3.5rem, 6.5vw, 6.2rem);
-  font-weight: 400;
+  font-weight: 650;
   letter-spacing: -0.055em;
   line-height: 0.92;
 }

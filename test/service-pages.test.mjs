@@ -184,6 +184,31 @@ test('internal pages use compact responsive image-backed heroes', async t => {
 });
 
 
+test('internal hero headings match the homepage heading typography', async t => {
+  const site = await startTestSite(process.cwd());
+  const browser = await launchBrowser();
+  t.after(async () => {
+    await browser.close();
+    await site.close();
+  });
+
+  await browser.goto(`${site.origin}/index.html`, { width: 1200, height: 900 });
+  const homepageTypography = await browser.evaluate(`(() => {
+    const style = getComputedStyle(document.querySelector('.hero h1'));
+    return { fontFamily: style.fontFamily, fontWeight: style.fontWeight };
+  })()`);
+
+  for (const page of heroPages) {
+    await browser.goto(`${site.origin}${page.path}`, { width: 1200, height: 900 });
+    const typography = await browser.evaluate(`(() => {
+      const style = getComputedStyle(document.querySelector('.page-intro h1'));
+      return { fontFamily: style.fontFamily, fontWeight: style.fontWeight };
+    })()`);
+    assert.deepEqual(typography, homepageTypography, page.path);
+  }
+});
+
+
 test('service sections alternate on desktop with equal text and image columns', async t => {
   const site = await startTestSite(process.cwd());
   const browser = await launchBrowser();
