@@ -39,6 +39,11 @@ const heroPages = [
   },
 ];
 
+const closingPages = [
+  '/index.html',
+  ...pages.map(page => page.path),
+];
+
 
 test('service pages contain the approved content and image semantics', async t => {
   const site = await startTestSite(process.cwd());
@@ -96,6 +101,60 @@ test('service pages contain the approved content and image semantics', async t =
       assert.equal(detail.hasCaption, false);
     }
     assert.deepEqual(browser.getErrors(), [], `${page.path} logged a JavaScript error`);
+  }
+});
+
+
+test('closing call labels stack above slogans while supporting actions stay to the right', async t => {
+  const site = await startTestSite(process.cwd());
+  const browser = await launchBrowser();
+  t.after(async () => {
+    await browser.close();
+    await site.close();
+  });
+
+  for (const path of closingPages) {
+    for (const width of [1200, 900, 390]) {
+      await browser.goto(`${site.origin}${path}`, { width, height: 900 });
+      const layout = await browser.evaluate(`(() => {
+        const rect = selector => document.querySelector(selector)?.getBoundingClientRect();
+        const gridElement = document.querySelector('.closing-grid');
+        const grid = gridElement?.getBoundingClientRect();
+        const gridStyle = gridElement ? getComputedStyle(gridElement) : null;
+        const gridPaddingLeft = parseFloat(gridStyle?.paddingLeft || '0');
+        const gridPaddingRight = parseFloat(gridStyle?.paddingRight || '0');
+        const label = rect('.closing-grid > .section-number');
+        const slogan = rect('.closing-grid > h2');
+        const action = rect('.closing-grid > div:last-child');
+        return {
+          gridContentLeft: (grid?.left || 0) + gridPaddingLeft,
+          gridContentWidth: (grid?.width || 0) - gridPaddingLeft - gridPaddingRight,
+          labelLeft: label?.left || 0,
+          labelBottom: label?.bottom || 0,
+          sloganLeft: slogan?.left || 0,
+          sloganTop: slogan?.top || 0,
+          sloganBottom: slogan?.bottom || 0,
+          sloganWidth: slogan?.width || 0,
+          actionLeft: action?.left || 0,
+          actionTop: action?.top || 0,
+          actionWidth: action?.width || 0,
+        };
+      })()`);
+
+      assert.ok(Math.abs(layout.labelLeft - layout.sloganLeft) <= 1, `${path} label and slogan are not aligned at ${width}px`);
+      assert.ok(layout.labelBottom <= layout.sloganTop, `${path} label is not above the slogan at ${width}px`);
+      if (width > 980) {
+        assert.ok(
+          layout.sloganLeft - layout.gridContentLeft < layout.gridContentWidth * 0.12,
+          `${path} slogan column needs more left-side space at ${width}px (${layout.sloganLeft - layout.gridContentLeft}px of ${layout.gridContentWidth}px)`,
+        );
+        assert.ok(layout.sloganWidth > layout.actionWidth * 1.85, `${path} slogan column is not wide enough at ${width}px`);
+        assert.ok(layout.actionLeft > layout.sloganLeft, `${path} action moved out of the right column at ${width}px`);
+      } else {
+        assert.ok(Math.abs(layout.actionLeft - layout.sloganLeft) <= 1, `${path} action alignment changed at ${width}px`);
+        assert.ok(layout.actionTop >= layout.sloganBottom, `${path} mobile action must follow the slogan`);
+      }
+    }
   }
 });
 

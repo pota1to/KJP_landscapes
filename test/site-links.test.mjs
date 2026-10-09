@@ -123,6 +123,16 @@ test('all pages use the crawlable KJP PNG favicon', async () => {
 });
 
 
+test('footer navigation omits the Our work link on every page', async () => {
+  for (const page of htmlPages) {
+    const html = await readFile(new URL(`../${page}`, import.meta.url), 'utf8');
+    const footer = html.match(/<footer[\s\S]*?<\/footer>/)?.[0] || '';
+    assert.doesNotMatch(footer, />\s*Our work\s*</i, `${page} footer still shows Our work`);
+    assert.doesNotMatch(footer, /href="[^"]*#gallery"/i, `${page} footer still links to the gallery`);
+  }
+});
+
+
 test('320px header keeps the full brand, menu and call action usable', async t => {
   const site = await startTestSite(process.cwd());
   const browser = await launchBrowser();
