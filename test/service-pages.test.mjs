@@ -44,6 +44,11 @@ const closingPages = [
   ...pages.map(page => page.path),
 ];
 
+const footerPages = [
+  ...closingPages,
+  '/about.html',
+];
+
 
 test('service pages contain the approved content and image semantics', async t => {
   const site = await startTestSite(process.cwd());
@@ -105,7 +110,7 @@ test('service pages contain the approved content and image semantics', async t =
 });
 
 
-test('closing call labels stack above slogans while supporting actions stay to the right', async t => {
+test('closing calls form one left-aligned column at every responsive width', async t => {
   const site = await startTestSite(process.cwd());
   const browser = await launchBrowser();
   t.after(async () => {
@@ -138,23 +143,114 @@ test('closing call labels stack above slogans while supporting actions stay to t
           actionLeft: action?.left || 0,
           actionTop: action?.top || 0,
           actionWidth: action?.width || 0,
+          actionBottom: action?.bottom || 0,
+          hasForcedBreak: Boolean(document.querySelector('.closing-grid > h2 br')),
+          sloganHeight: slogan?.height || 0,
+          sloganLineHeight: parseFloat(getComputedStyle(document.querySelector('.closing-grid > h2')).lineHeight),
         };
       })()`);
 
       assert.ok(Math.abs(layout.labelLeft - layout.sloganLeft) <= 1, `${path} label and slogan are not aligned at ${width}px`);
       assert.ok(layout.labelBottom <= layout.sloganTop, `${path} label is not above the slogan at ${width}px`);
-      if (width > 980) {
-        assert.ok(
-          layout.sloganLeft - layout.gridContentLeft < layout.gridContentWidth * 0.12,
-          `${path} slogan column needs more left-side space at ${width}px (${layout.sloganLeft - layout.gridContentLeft}px of ${layout.gridContentWidth}px)`,
-        );
-        assert.ok(layout.sloganWidth > layout.actionWidth * 1.85, `${path} slogan column is not wide enough at ${width}px`);
-        assert.ok(layout.actionLeft > layout.sloganLeft, `${path} action moved out of the right column at ${width}px`);
-      } else {
-        assert.ok(Math.abs(layout.actionLeft - layout.sloganLeft) <= 1, `${path} action alignment changed at ${width}px`);
-        assert.ok(layout.actionTop >= layout.sloganBottom, `${path} mobile action must follow the slogan`);
+      assert.ok(Math.abs(layout.sloganLeft - layout.gridContentLeft) <= 1, `${path} closing copy is not aligned to the left at ${width}px`);
+      assert.ok(Math.abs(layout.actionLeft - layout.sloganLeft) <= 1, `${path} action copy is not aligned to the slogan at ${width}px`);
+      assert.ok(layout.actionTop >= layout.sloganBottom, `${path} action must follow the slogan at ${width}px`);
+
+      if (path === '/groundworks-structural.html' && width >= 900) {
+        assert.equal(layout.hasForcedBreak, false, `groundworks slogan still has a forced break at ${width}px`);
+        assert.ok(layout.sloganHeight <= layout.sloganLineHeight * 1.25, `groundworks slogan wraps at ${width}px`);
       }
     }
+  }
+});
+
+
+test('homepage closing slogan stays on one line at wide laptop widths', async t => {
+  const site = await startTestSite(process.cwd());
+  const browser = await launchBrowser();
+  t.after(async () => {
+    await browser.close();
+    await site.close();
+  });
+
+  await browser.goto(`${site.origin}/index.html`, { width: 1840, height: 900 });
+  const slogan = await browser.evaluate(`(() => {
+    const element = document.querySelector('.closing-grid > h2');
+    const rect = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return {
+      hasForcedBreak: Boolean(element.querySelector('br')),
+      height: rect.height,
+      lineHeight: parseFloat(style.lineHeight),
+    };
+  })()`);
+
+  assert.equal(slogan.hasForcedBreak, false);
+  assert.ok(
+    slogan.height <= slogan.lineHeight * 1.25,
+    'homepage closing slogan wraps at 1840px',
+  );
+});
+
+
+test('tablet footers keep navigation on one left-aligned line', async t => {
+  const site = await startTestSite(process.cwd());
+  const browser = await launchBrowser();
+  t.after(async () => {
+    await browser.close();
+    await site.close();
+  });
+
+  for (const path of footerPages) {
+    await browser.goto(`${site.origin}${path}`, { width: 900, height: 900 });
+    const layout = await browser.evaluate(`(() => {
+      const footer = document.querySelector('.footer-grid');
+      const nav = footer?.querySelector('nav');
+      const footerRect = footer?.getBoundingClientRect();
+      const navRect = nav?.getBoundingClientRect();
+      const footerStyle = footer ? getComputedStyle(footer) : null;
+      const contentLeft = (footerRect?.left || 0) + parseFloat(footerStyle?.paddingLeft || '0');
+      const linkTops = [...(nav?.querySelectorAll('a') || [])].map(link => link.getBoundingClientRect().top);
+      return {
+        contentLeft,
+        navLeft: navRect?.left || 0,
+        linkTops,
+        noPageOverflow: document.documentElement.scrollWidth <= window.innerWidth,
+      };
+    })()`);
+
+    assert.ok(Math.abs(layout.navLeft - layout.contentLeft) <= 1, `${path} footer links are not left aligned`);
+    assert.ok(Math.max(...layout.linkTops) - Math.min(...layout.linkTops) <= 1, `${path} footer links wrap at tablet width`);
+    assert.equal(layout.noPageOverflow, true, `${path} footer causes horizontal overflow`);
+  }
+});
+
+
+test('mobile footers keep links left aligned without horizontal overflow', async t => {
+  const site = await startTestSite(process.cwd());
+  const browser = await launchBrowser();
+  t.after(async () => {
+    await browser.close();
+    await site.close();
+  });
+
+  for (const path of footerPages) {
+    await browser.goto(`${site.origin}${path}`, { width: 320, height: 700 });
+    const layout = await browser.evaluate(`(() => {
+      const footer = document.querySelector('.footer-grid');
+      const nav = footer?.querySelector('nav');
+      const footerRect = footer?.getBoundingClientRect();
+      const navRect = nav?.getBoundingClientRect();
+      const footerStyle = footer ? getComputedStyle(footer) : null;
+      return {
+        contentLeft: (footerRect?.left || 0) + parseFloat(footerStyle?.paddingLeft || '0'),
+        navLeft: navRect?.left || 0,
+        noPageOverflow: document.documentElement.scrollWidth <= window.innerWidth,
+      };
+    })()`);
+
+    assert.ok(Math.abs(layout.navLeft - layout.contentLeft) <= 1, `${path} mobile footer links are not left aligned`);
+    assert.equal(layout.noPageOverflow, true, `${path} mobile footer causes horizontal overflow`);
   }
 });
 

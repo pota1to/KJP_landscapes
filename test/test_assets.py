@@ -75,6 +75,14 @@ class ServiceAssetTests(unittest.TestCase):
                     self.assertEqual(image.size, expected_size)
                 self.assertLessEqual(path.stat().st_size, 350 * 1024)
 
+    def test_about_service_area_map_is_an_optimised_webp_file(self):
+        path = ROOT / "assets" / "areas-map.webp"
+        self.assertTrue(path.exists(), "Missing areas-map.webp")
+        with Image.open(path) as image:
+            self.assertEqual(image.format, "WEBP")
+            self.assertEqual(image.size, (1200, 1200))
+        self.assertLessEqual(path.stat().st_size, 350 * 1024)
+
     def test_credits_page_and_links_are_removed(self):
         self.assertFalse((ROOT / "credits.html").exists())
         for page in (
