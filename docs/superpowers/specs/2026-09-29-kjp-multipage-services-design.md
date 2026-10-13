@@ -66,11 +66,11 @@ Each category page will contain:
 4. Existing green closing call-to-action.
 5. Shared footer.
 
-Every service-detail section will place its descriptive text before its image in the HTML for consistent reading order. Desktop CSS will use a `2fr 1fr` grid:
+Every service-detail section will place its descriptive text before its image in the HTML for consistent reading order. Desktop CSS will use a `1fr 1fr` grid:
 
 - Odd sections: text left, image right.
 - Even sections: image left, text right through CSS grid placement.
-- The image column is no more than one-third of the available subsection width.
+- The image and text columns each occupy half of the available subsection width.
 
 At mobile widths, every section becomes a single column with text followed by image. Images use a consistent `4 / 3` frame, centred `object-fit: cover` cropping, no rounded corners, explicit dimensions, lazy loading, and descriptive alternative text.
 
@@ -179,7 +179,7 @@ Implementation will use automated static and browser checks plus visual review. 
 - Menu open, close, Escape, outside-click, link-click, focus-return, and desktop-resize behaviours work.
 - No-JavaScript navigation remains usable.
 - Service sections alternate correctly on desktop and stack text-before-image on mobile.
-- Service images never exceed one-third of the desktop section grid.
+- Service images and text use equal-width columns in the desktop section grid.
 - All eight stock assets are local WebP files with dimensions, alt text, lazy loading, and corresponding credit links.
 - Existing homepage carousel behaviour remains unchanged: three desktop states and six mobile states.
 - JavaScript syntax and repository diff checks pass.

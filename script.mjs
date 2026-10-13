@@ -22,6 +22,88 @@ export function getRelativeSlideOffset(slideOffset, firstSlideOffset) {
   return slideOffset - firstSlideOffset;
 }
 
+export function getMenuPresentation(isOpen) {
+  return {
+    expanded: String(isOpen),
+    label: isOpen ? 'Close menu' : 'Open menu'
+  };
+}
+
+export function createNavigationMenu(
+  header,
+  desktopMedia = window.matchMedia('(min-width: 981px)')
+) {
+  const toggle = header?.querySelector('[data-menu-toggle]');
+  const nav = header?.querySelector('[data-site-nav]');
+  const noop = () => {};
+
+  if (!toggle || !nav) {
+    return { open: noop, close: noop, destroy: noop };
+  }
+
+  let isOpen = false;
+
+  const sync = () => {
+    const menuIsOpen = !desktopMedia.matches && isOpen;
+    const presentation = getMenuPresentation(menuIsOpen);
+    toggle.setAttribute('aria-expanded', presentation.expanded);
+    toggle.setAttribute('aria-label', presentation.label);
+    nav.hidden = !desktopMedia.matches && !menuIsOpen;
+    header.classList.toggle('menu-open', menuIsOpen);
+  };
+
+  const open = () => {
+    if (desktopMedia.matches) return;
+    isOpen = true;
+    sync();
+  };
+
+  const close = ({ restoreFocus = false } = {}) => {
+    const wasOpen = isOpen;
+    isOpen = false;
+    sync();
+    if (restoreFocus && wasOpen) toggle.focus();
+  };
+
+  const onToggleClick = () => isOpen ? close() : open();
+  const onNavClick = event => {
+    if (event.target.closest('a')) close();
+  };
+  const onDocumentClick = event => {
+    if (isOpen && !header.contains(event.target)) close();
+  };
+  const onKeydown = event => {
+    if (event.key === 'Escape' && isOpen) close({ restoreFocus: true });
+  };
+  const onMediaChange = () => close();
+
+  toggle.hidden = false;
+  header.classList.add('menu-ready');
+  toggle.addEventListener('click', onToggleClick);
+  nav.addEventListener('click', onNavClick);
+  document.addEventListener('click', onDocumentClick);
+  document.addEventListener('keydown', onKeydown);
+  desktopMedia.addEventListener('change', onMediaChange);
+  sync();
+
+  return {
+    open,
+    close,
+    destroy() {
+      toggle.removeEventListener('click', onToggleClick);
+      nav.removeEventListener('click', onNavClick);
+      document.removeEventListener('click', onDocumentClick);
+      document.removeEventListener('keydown', onKeydown);
+      desktopMedia.removeEventListener('change', onMediaChange);
+      header.classList.remove('menu-ready', 'menu-open');
+      toggle.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open menu');
+      nav.hidden = false;
+    }
+  };
+}
+
 export function createCarousel(root) {
   const track = root.querySelector('.carousel-track');
   const slides = [...root.querySelectorAll('.carousel-slide')];
@@ -148,5 +230,6 @@ export function createCarousel(root) {
 }
 
 if (typeof document !== 'undefined') {
-  document.querySelectorAll('.carousel').forEach(createCarousel);
+document.querySelectorAll('.site-header').forEach(header => createNavigationMenu(header));
+document.querySelectorAll('.carousel').forEach(createCarousel);
 }
