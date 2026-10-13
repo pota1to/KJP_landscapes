@@ -32,9 +32,11 @@ class ServiceAssetTests(unittest.TestCase):
             self.assertEqual(image.format, "PNG")
             self.assertEqual(image.size, (96, 96))
 
-        expected_link = (
-            '<link rel="icon" type="image/png" sizes="96x96" '
-            'href="/kjp-logo96x96.png">'
+        expected_attributes = (
+            'rel="icon"',
+            'type="image/png"',
+            'sizes="96x96"',
+            'href="/kjp-logo96x96.png"',
         )
         for page in (
             "index.html",
@@ -45,7 +47,12 @@ class ServiceAssetTests(unittest.TestCase):
         ):
             html = (ROOT / page).read_text(encoding="utf-8")
             with self.subTest(page=page):
-                self.assertIn(expected_link, html)
+                favicon_line = next(
+                    (line for line in html.splitlines() if 'rel="icon"' in line),
+                    "",
+                )
+                for attribute in expected_attributes:
+                    self.assertIn(attribute, favicon_line)
                 self.assertNotIn("data:image/svg+xml", html)
 
     def test_service_images_are_optimised_webp_files(self):
