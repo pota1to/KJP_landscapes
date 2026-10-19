@@ -44,6 +44,7 @@ class ServiceAssetTests(unittest.TestCase):
             "hardscaping-features.html",
             "lawns-decking.html",
             "about.html",
+            "gallery.html",
         ):
             html = (ROOT / page).read_text(encoding="utf-8")
             with self.subTest(page=page):
@@ -83,6 +84,29 @@ class ServiceAssetTests(unittest.TestCase):
             self.assertEqual(image.size, (1200, 1200))
         self.assertLessEqual(path.stat().st_size, 350 * 1024)
 
+    def test_gallery_images_have_optimised_thumbnail_and_full_variants(self):
+        expected = {f"gallery-{index:02}.webp" for index in range(1, 57)}
+        variants = (
+            (ROOT / "assets" / "gallery" / "thumbs", 720, 250 * 1024),
+            (ROOT / "assets" / "gallery" / "full", 1920, 900 * 1024),
+        )
+
+        for directory, max_edge, max_bytes in variants:
+            with self.subTest(directory=directory.name):
+                self.assertTrue(directory.is_dir(), f"Missing {directory}")
+                actual = {path.name for path in directory.iterdir() if path.is_file()}
+                self.assertEqual(actual, expected)
+
+            for filename in sorted(expected):
+                path = directory / filename
+                with self.subTest(variant=directory.name, filename=filename):
+                    with Image.open(path) as image:
+                        self.assertEqual(image.format, "WEBP")
+                        self.assertGreater(image.width, 0)
+                        self.assertGreater(image.height, 0)
+                        self.assertLessEqual(max(image.size), max_edge)
+                    self.assertLessEqual(path.stat().st_size, max_bytes)
+
     def test_credits_page_and_links_are_removed(self):
         self.assertFalse((ROOT / "credits.html").exists())
         for page in (
@@ -91,6 +115,7 @@ class ServiceAssetTests(unittest.TestCase):
             "hardscaping-features.html",
             "lawns-decking.html",
             "about.html",
+            "gallery.html",
         ):
             html = (ROOT / page).read_text(encoding="utf-8")
             self.assertNotIn("credits.html", html)
