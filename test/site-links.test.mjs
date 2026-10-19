@@ -11,6 +11,7 @@ const htmlPages = [
   'hardscaping-features.html',
   'lawns-decking.html',
   'about.html',
+  'gallery.html',
 ];
 
 const requiredPageLinks = [
@@ -18,8 +19,16 @@ const requiredPageLinks = [
   '/groundworks-structural',
   '/hardscaping-features',
   '/lawns-decking',
+  '/gallery',
   '/about',
 ];
+
+
+test('sitemap exposes the canonical gallery route exactly once', async () => {
+  const sitemap = await readFile(new URL('../sitemap.xml', import.meta.url), 'utf8');
+  const matches = sitemap.match(/<loc>https:\/\/kjplandscapes\.co\.uk\/gallery<\/loc>/g) || [];
+  assert.equal(matches.length, 1);
+});
 
 
 test('About page uses the approved two-section content and service-area map', async t => {
