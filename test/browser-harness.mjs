@@ -1,14 +1,16 @@
 import { spawn } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
-import { createServer } from 'node:net';
+import { readFile } from 'node:fs/promises';
+import { createServer as createHttpServer } from 'node:http';
+import { createServer as createNetServer } from 'node:net';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { extname, join, resolve, sep } from 'node:path';
 
 const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 async function getFreePort() {
   return await new Promise((resolve, reject) => {
-    const server = createServer();
+    const server = createNetServer();
     server.once('error', reject);
     server.listen(0, '127.0.0.1', () => {
       const { port } = server.address();
@@ -38,19 +40,59 @@ async function stopProcess(child) {
 }
 
 export async function startTestSite(rootPath) {
-  const port = await getFreePort();
-  const child = spawn('python3', [
-    '-m', 'http.server', String(port),
-    '--bind', '127.0.0.1',
-    '--directory', rootPath
-  ], { stdio: 'ignore' });
+  const siteRoot = resolve(rootPath);
+  const contentTypes = {
+    '.css': 'text/css; charset=utf-8',
+    '.html': 'text/html; charset=utf-8',
+    '.ico': 'image/x-icon',
+    '.js': 'text/javascript; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.mjs': 'text/javascript; charset=utf-8',
+    '.png': 'image/png',
+    '.svg': 'image/svg+xml',
+    '.txt': 'text/plain; charset=utf-8',
+    '.webp': 'image/webp',
+    '.xml': 'application/xml; charset=utf-8',
+  };
+  const server = createHttpServer(async (request, response) => {
+    try {
+      const pathname = decodeURIComponent(new URL(request.url, 'http://127.0.0.1').pathname);
+      const requestedFile = pathname === '/'
+        ? '/index.html'
+        : extname(pathname) ? pathname : `${pathname}.html`;
+      const filePath = resolve(siteRoot, `.${requestedFile}`);
+
+      if (filePath !== siteRoot && !filePath.startsWith(`${siteRoot}${sep}`)) {
+        response.writeHead(403).end('Forbidden');
+        return;
+      }
+
+      const body = await readFile(filePath);
+      response.writeHead(200, {
+        'Content-Type': contentTypes[extname(filePath)] || 'application/octet-stream',
+      });
+      response.end(request.method === 'HEAD' ? undefined : body);
+    } catch (error) {
+      if (error.code === 'ENOENT' || error instanceof URIError) {
+        response.writeHead(404).end('Not found');
+        return;
+      }
+      response.writeHead(500).end('Internal server error');
+    }
+  });
+  await new Promise((resolveListening, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', resolveListening);
+  });
+  const { port } = server.address();
   const origin = `http://127.0.0.1:${port}`;
-  await waitForUrl(`${origin}/index.html`);
 
   return {
     origin,
     async close() {
-      await stopProcess(child);
+      await new Promise((resolveClosed, reject) => {
+        server.close(error => error ? reject(error) : resolveClosed());
+      });
     }
   };
 }

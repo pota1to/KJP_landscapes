@@ -14,11 +14,11 @@ const htmlPages = [
 ];
 
 const requiredPageLinks = [
-  'index.html',
-  'groundworks-structural.html',
-  'hardscaping-features.html',
-  'lawns-decking.html',
-  'about.html',
+  '/',
+  '/groundworks-structural',
+  '/hardscaping-features',
+  '/lawns-decking',
+  '/about',
 ];
 
 
@@ -129,13 +129,21 @@ test('homepage services and About content link to their dedicated pages', async 
     about: document.querySelector('.about-copy .text-link')?.getAttribute('href'),
   }))()`);
   assert.deepEqual(links.headings, [
-    'groundworks-structural.html',
-    'hardscaping-features.html',
-    'lawns-decking.html',
+    '/groundworks-structural',
+    '/hardscaping-features',
+    '/lawns-decking',
   ]);
-  assert.equal(links.rows.length, 8);
-  assert.deepEqual(new Set(links.rows), new Set(links.headings));
-  assert.equal(links.about, 'about.html');
+  assert.deepEqual(links.rows, [
+    '/groundworks-structural#concrete',
+    '/groundworks-structural#drain',
+    '/hardscaping-features#patio',
+    '/hardscaping-features#fence',
+    '/hardscaping-features#raisedbeds',
+    '/lawns-decking#decking',
+    '/lawns-decking#turf',
+    '/lawns-decking#astro',
+  ]);
+  assert.equal(links.about, '/about');
 });
 
 
@@ -149,7 +157,7 @@ test('all pages expose consistent relative navigation and every local resource r
     const references = [...html.matchAll(/(?:href|src)="([^"]+)"/g)].map(match => match[1]);
     const footer = html.match(/<footer[\s\S]*?<\/footer>/)?.[0] || '';
     const footerReferences = [...footer.matchAll(/href="([^"]+)"/g)].map(match => match[1]);
-    assert.ok(references.includes('index.html'), `${page} needs a home brand link`);
+    assert.ok(references.includes('/'), `${page} needs a home brand link`);
     assert.ok(!references.includes('credits.html'), `${page} still links to credits.html`);
     for (const href of requiredPageLinks) {
       assert.ok(references.includes(href), `${page} is missing ${href}`);
