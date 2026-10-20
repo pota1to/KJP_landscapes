@@ -15,6 +15,7 @@ test('gallery page exposes all supplied projects as accessible controls', async 
   await browser.goto(`${site.origin}/gallery`, { width: 1200, height: 900 });
   const state = await browser.evaluate(`(() => ({
     headings: [...document.querySelectorAll('h1')].map(element => element.textContent.trim()),
+    viewerInitialSrc: document.querySelector('[data-gallery-viewer-image]')?.getAttribute('src'),
     items: [...document.querySelectorAll('[data-gallery-item]')].map(item => {
       const image = item.querySelector('img');
       return {
@@ -33,6 +34,7 @@ test('gallery page exposes all supplied projects as accessible controls', async 
   }))()`);
 
   assert.deepEqual(state.headings, ['Our work']);
+  assert.equal(state.viewerInitialSrc, null, 'full-size images must not load before the viewer opens');
   assert.equal(state.items.length, 56);
   assert.equal(new Set(state.items.map(item => item.full)).size, 56);
 
